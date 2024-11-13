@@ -4,8 +4,11 @@ import React, { useEffect, useState } from 'react';
 import YouTube from 'react-youtube';
 import axios from 'axios';
 import Link from 'next/link';
-import { Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, SidebarMenuButton, SidebarFooter, SidebarProvider, SidebarTrigger } from '@/components/ui/sidebar';
+import { Sidebar, SidebarHeader, SidebarContent, SidebarMenu, SidebarMenuItem, 
+         SidebarMenuButton, SidebarFooter, SidebarProvider } from '@/components/ui/sidebar';
 import { BookOpen, Home } from 'lucide-react';
+import { Button } from '@/components/ui/button';
+import { useRouter } from 'next/navigation';
 
 interface Course {
   id: string;
@@ -24,40 +27,79 @@ interface Enrollment {
 export default function Page({ params }: { params: { id: string } }) {
   const [course, setCourse] = useState<Course | null>(null);
   const [enrollment, setEnrollment] = useState<Enrollment | null>(null);
-  const [quizScore, setQuizScore] = useState<number | null>(null);
   const [isQuizAvailable, setIsQuizAvailable] = useState(false);
   const [progress, setProgress] = useState(0);
+  const [player, setPlayer] = useState<any>(null);
+  const [videoDuration, setVideoDuration] = useState(0);
+  const router = useRouter();
 
   useEffect(() => {
-    // Fetch course and enrollment details
     async function fetchCourse() {
-      const courseResponse = await axios.get(`/api/courses/${params.id}`);
-      setCourse(courseResponse.data.course);
-      setEnrollment(courseResponse.data.enrollment);
+      try {
+        const courseResponse = await axios.get(`/api/courses/${params.id}`);
+        setCourse(courseResponse.data.course);
+        setEnrollment(courseResponse.data.enrollment);
+        if (courseResponse.data.enrollment) {
+          setProgress(courseResponse.data.enrollment.progress);
+        }
+      } catch (error) {
+        console.error('Error fetching course:', error);
+      }
     }
     fetchCourse();
   }, [params.id]);
 
-  const handleProgressUpdate = async (e: any) => {
-    const currentTime = e.target.getCurrentTime();
-    const duration = e.target.getDuration();
-    setProgress((currentTime / duration) * 100);
-
-    // Update progress in the backend
-    await axios.patch(`/api/enroll/${enrollment?.id}`, { progress });
-
-    if (progress >= 95) {
-      setIsQuizAvailable(true);
+  const handleOnReady = (event: any) => {
+    setPlayer(event.target);
+    const duration = event.target.getDuration();
+    setVideoDuration(duration);
+    
+    // Calculate the start time based on saved progress
+    if (enrollment?.progress) {
+      const startTimeInSeconds = (enrollment.progress / 100) * duration;
+      // Seek to the saved position
+      event.target.seekTo(startTimeInSeconds);
     }
   };
 
-  const handleQuizSubmit = async () => {
-    const response = await axios.post(`/api/enroll/${enrollment?.id}/quiz`, { score: quizScore });
-    setEnrollment(response.data.enrollment);
-    alert('Quiz score submitted!');
+  const handleProgressUpdate = async (event: any) => {
+    if (!player || !videoDuration) return;
+
+    const currentTime = player.getCurrentTime();
+    const newProgress = (currentTime / videoDuration) * 100;
+    
+    // Only update if progress has increased
+    if (newProgress > progress) {
+      setProgress(newProgress);
+
+      // Update backend if progress has changed significantly (e.g., every 1%)
+      if (Math.floor(newProgress) > Math.floor(progress)) {
+        try {
+          await axios.patch(`/api/enrollments/${enrollment?.id}`, {
+            progress: newProgress
+          });
+
+          if (newProgress >= 95) {
+            setIsQuizAvailable(true);
+          }
+        } catch (error) {
+          console.error('Error updating progress:', error);
+        }
+      }
+    }
   };
 
-  if (!course) return <p>Loading...</p>;
+  const handleStartQuiz = () => {
+    router.push(`/courses/${params.id}/quiz`);
+  };
+
+  if (!course) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900"></div>
+      </div>
+    );
+  }
 
   return (
     <SidebarProvider>
@@ -89,61 +131,68 @@ export default function Page({ params }: { params: { id: string } }) {
               </SidebarMenuItem>
             </SidebarMenu>
           </SidebarContent>
-          <SidebarFooter>
-            {/* Add footer content if needed */}
-          </SidebarFooter>
+          <SidebarFooter />
         </Sidebar>
-        <main className="overflow-y-auto p-8 w-full">
-          <div className="mb-8 flex flex-col items-center justify-between">
-            <h1 className="text-3xl font-bold mb-2">{course.title}</h1>
-            <p className="text-gray-600 mb-4">{course.description}</p>
-          </div>
-          <div className="mb-4 flex justify-center">
-    <YouTube
-      videoId={course.videoUrl}
-      opts={{
-        playerVars: {
-          autoplay: 1,
-          modestbranding: 1,
-          controls: 1,
-        },
-      }}
-      onStateChange={handleProgressUpdate}
-    //   style={{
-    //     width: '100%',
-    //     height: '100%',
-    //   }}
-    />
-</div>
-          <div className=''>
-          <div className="mt-4">
-              <div className="flex justify-between text-sm">
-                <span>Progress</span>
-                <span>{progress.toFixed(2)}%</span>
-              </div>
-              <div className="mt-1 h-2 w-full rounded-full bg-muted">
-                <div
-                  className="h-2 rounded-full bg-primary"
-                  style={{ width: `${progress.toFixed(2)}%` }}
-                />
-              </div>
+        
+        <main className="flex-1 overflow-y-auto p-8">
+          <div className="max-w-4xl mx-auto">
+            <div className="mb-8 flex flex-col items-center justify-between">
+              <h1 className="text-3xl font-bold mb-2">{course.title}</h1>
+              <p className="text-gray-600 mb-4">{course.description}</p>
             </div>
-          </div>
-          {isQuizAvailable && (
-            <div className="quiz-section mt-4">
-              <h2 className="text-2xl font-semibold mb-2">Quiz</h2>
-              <label className="block mb-2">Enter your score:</label>
-              <input
-                type="number"
-                value={quizScore ?? ''}
-                onChange={(e) => setQuizScore(parseInt(e.target.value))}
-                className="border rounded p-1 mb-2"
+            
+            <div className="mb-4 aspect-video">
+              <YouTube
+                videoId={course.videoUrl}
+                opts={{
+                  height: '100%',
+                  width: '100%',
+                  playerVars: {
+                    autoplay: 1,
+                    modestbranding: 1,
+                    controls: 1,
+                  },
+                }}
+                onReady={handleOnReady}
+                onStateChange={handleProgressUpdate}
+                className="w-full h-full"
               />
-              <button onClick={handleQuizSubmit} className="bg-blue-500 text-white px-4 py-2 rounded">
-                Submit Quiz
-              </button>
             </div>
-          )}
+
+            <div className="mt-6 space-y-6">
+              <div>
+                <div className="flex justify-between text-sm">
+                  <span>Progress</span>
+                  <span>{progress.toFixed(1)}%</span>
+                </div>
+                <div className="mt-1 h-2 w-full rounded-full bg-muted">
+                  <div
+                    className="h-2 rounded-full bg-primary transition-all duration-300"
+                    style={{ width: `${progress}%` }}
+                  />
+                </div>
+              </div>
+
+              {progress >= 95 && !enrollment?.completed && (
+                <div className="text-center">
+                  <Button
+                    onClick={handleStartQuiz}
+                    className="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg"
+                  >
+                    Start Quiz
+                  </Button>
+                </div>
+              )}
+
+              {enrollment?.completed && (
+                <div className="text-center p-4 bg-green-100 rounded-lg">
+                  <p className="text-green-800 font-semibold">
+                    Course Completed! Quiz Score: {enrollment.quizScore}%
+                  </p>
+                </div>
+              )}
+            </div>
+          </div>
         </main>
       </div>
     </SidebarProvider>

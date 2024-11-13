@@ -86,7 +86,15 @@ model Course {
   title     String
   description String
   videoUrl  String   // YouTube video URL or ID
+  quizData   Question[]   
   enrollments Enrollment[]
+}
+
+type Question {
+  id            Int
+  question      String
+  options       String[]  
+  correctAnswer Int
 }
 
 model Enrollment {
@@ -94,7 +102,7 @@ model Enrollment {
   userId     String   @db.ObjectId
   courseId   String   @db.ObjectId
   progress   Float    @default(0.0) // Percentage of video watched
-  quizScore  Int?     // Quiz score, if available
+  quizScore  Int?     // Quiz score, if available 
   completed  Boolean  @default(false) // Whether the course is completed
   user       User     @relation(fields: [userId], references: [id])
   course     Course   @relation(fields: [courseId], references: [id])
