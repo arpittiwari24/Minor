@@ -93,7 +93,7 @@ export default function CoursesPage() {
       redirect(`/courses/${courseId}`);
     } catch (error) {
       console.error('Error enrolling in course:', error);
-      toast.error('Failed to enroll in course');
+      // toast.error('Failed to enroll in course');
     }
   };
 
