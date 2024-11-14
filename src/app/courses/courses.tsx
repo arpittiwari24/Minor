@@ -81,7 +81,10 @@ export default function CoursesPage() {
 
   const handleEnroll = async (courseId: string) => {
     try {
-      const response = await axios.post(`/api/courses/${courseId}/enroll`);
+      const response = await axios.post(`/api/enroll/`,{
+        courseId,
+        userId: session?.user.id
+      });
       setEnrollments(prev => ({
         ...prev,
         [courseId]: response.data.enrollment
