@@ -23,7 +23,7 @@ const authOptions: NextAuthOptions = {
           accessTokenUrl: `https://github.com/login/oauth/authorize?client_id=${process.env.GITHUB_CLIENT_ID}&state=matakijai&redirect_uri=http://localhost:6969/api/auth/callback/github`,
           authorization : {
             params : {
-                scope : 'repo read:user '
+                scope : 'repo user '
             }
           },
           async profile(profile, tokens) {
