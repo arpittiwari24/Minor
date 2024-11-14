@@ -1,36 +1,100 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Minor
 
-## Getting Started
+## Project Description
+Minor is an AI-powered learning platform designed to provide users with personalized learning paths, adaptive quizzes, and real-time feedback to help them master any subject. With features such as course enrollment, quiz generation, and progress tracking, it offers an interactive and engaging educational experience.
 
-First, run the development server:
+## Features and Functionality
+- **User Authentication**: Secure login using GitHub OAuth.
+- **Course Management**: Ability to create, retrieve, and manage courses, including quizzes.
+- **Quiz Generation**: AI-generated quizzes based on course content.
+- **Progress Tracking**: Users can track their progress through courses, including completed lessons and quiz scores.
+- **Responsive Design**: Mobile-friendly interface for learning on-the-go.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## Technology Stack
+- **Frontend**: React, Next.js, Tailwind CSS
+- **Backend**: Node.js, Next.js API routes
+- **Database**: Prisma with PostgreSQL
+- **Authentication**: NextAuth.js for OAuth authentication
+- **AI Integration**: OpenAI's GPT-3.5-turbo for quiz generation
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Prerequisites
+- Node.js (version 14 or higher)
+- PostgreSQL database
+- GitHub account for OAuth authentication
+- OpenAI API key
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Installation Instructions
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/arpittiwari24/Minor.git
+   ```
+2. Navigate to the project directory:
+   ```bash
+   cd Minor
+   ```
+3. Install the necessary dependencies:
+   ```bash
+   npm install
+   ```
+4. Set up your environment variables:
+   Create a `.env` file in the root directory and add the following:
+   ```env
+   DATABASE_URL="your_database_connection_string"
+   NEXTAUTH_SECRET="your_nextauth_secret"
+   GITHUB_CLIENT_ID="your_github_client_id"
+   GITHUB_CLIENT_SECRET="your_github_client_secret"
+   OPENAI_API_KEY="your_openai_api_key"
+   ```
+5. Run the database migrations:
+   ```bash
+   npx prisma migrate dev
+   ```
+6. Start the development server:
+   ```bash
+   npm run dev
+   ```
 
-This project uses [`next/font`](https://nextjs.org/docs/basic-features/font-optimization) to automatically optimize and load Inter, a custom Google Font.
+## Usage Guide
+- Navigate to `http://localhost:3000` in your browser.
+- Sign in with your GitHub account to access the platform.
+- Explore available courses, enroll, and start learning.
+- Complete quizzes to test your knowledge and track your progress.
 
-## Learn More
+## API Documentation
+The API is structured using Next.js API routes. Below are some key endpoints:
 
-To learn more about Next.js, take a look at the following resources:
+- **Authentication**
+  - `GET /api/auth/[...nextauth]`: Handles user authentication.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+- **Courses**
+  - `GET /api/courses`: Retrieves all courses.
+  - `GET /api/courses/[id]`: Retrieves a specific course by ID.
+  - `POST /api/courses`: Adds a new course.
+  
+- **Quizzes**
+  - `POST /api/courses/[id]/quiz`: Submits answers for a quiz and returns the user's score.
+  - `GET /api/courses/[id]/quiz`: Retrieves quiz questions for a specific course.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
+## Contributing Guidelines
+1. Fork the repository.
+2. Create a new branch for your feature:
+   ```bash
+   git checkout -b feature/YourFeature
+   ```
+3. Make your changes and commit them:
+   ```bash
+   git commit -m "Add some feature"
+   ```
+4. Push to the branch:
+   ```bash
+   git push origin feature/YourFeature
+   ```
+5. Open a Pull Request to the main branch.
 
-## Deploy on Vercel
+## License Information
+This project does not currently specify a license. Please check back later for updates.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
+## Contact/Support Information
+For any questions or support, feel free to reach out:
+- Email: [your-email@example.com]
+- GitHub: [arpittiwari24](https://github.com/arpittiwari24)
