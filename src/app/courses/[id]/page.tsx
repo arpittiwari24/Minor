@@ -75,7 +75,7 @@ export default function Page({ params }: { params: { id: string } }) {
       // Update backend if progress has changed significantly (e.g., every 1%)
       if (Math.floor(newProgress) > Math.floor(progress)) {
         try {
-          await axios.patch(`/api/enrollments/${enrollment?.id}`, {
+          await axios.patch(`/api/enroll/${enrollment?.id}`, {
             progress: newProgress
           });
 
