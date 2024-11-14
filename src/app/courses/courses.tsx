@@ -12,7 +12,7 @@ import Image from 'next/image';
 import axios from 'axios';
 import { signOut, useSession } from 'next-auth/react';
 import { redirect } from 'next/navigation';
-import { toast } from 'sonner';
+import toast from 'react-hot-toast';
 
 interface Course {
   id: string;
@@ -209,7 +209,7 @@ export default function CoursesPage() {
                 <SidebarMenuButton asChild>
                   <Link href="/courses" className="bg-secondary">
                     <BookOpen className="h-5 w-5" />
-                    All Courses
+                    Explore Courses
                   </Link>
                 </SidebarMenuButton>
               </SidebarMenuItem>
