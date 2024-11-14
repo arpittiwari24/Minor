@@ -41,7 +41,7 @@ const getCourseImage = (title: string): string => {
       return '/mern.png';
 
     default:
-      return '/mern.png'; // fallback image
+      return '/ai.png'; // fallback image
   }
 };
 
