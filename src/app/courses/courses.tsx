@@ -51,6 +51,10 @@ export default function CoursesPage() {
   const [enrollments, setEnrollments] = useState<Record<string, Enrollment>>({});
   const [loading, setLoading] = useState(true);
 
+  // if(!session) {
+  //   redirect('/');
+  // }
+
   useEffect(() => {
     async function fetchData() {
       try {
@@ -139,7 +143,7 @@ export default function CoursesPage() {
             <SidebarHeader>
               <div className="flex items-center gap-2 p-4">
                 <Library className="h-6 w-6" />
-                <span className="text-lg font-semibold">Learning Platform</span>
+                <span className="text-lg font-semibold">Quizify</span>
               </div>
             </SidebarHeader>
             <SidebarContent>
@@ -156,7 +160,7 @@ export default function CoursesPage() {
                   <SidebarMenuButton asChild>
                     <Link href="/courses" className="bg-secondary">
                       <BookOpen className="h-5 w-5" />
-                      All Courses
+                      Explore Courses
                     </Link>
                   </SidebarMenuButton>
                 </SidebarMenuItem>

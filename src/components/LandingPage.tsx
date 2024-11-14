@@ -114,9 +114,9 @@ export default function LandingPage() {
                 </div>
                 <div className="flex flex-col gap-2 min-[400px]:flex-row">
                   <Button size="lg" onClick={() => signIn("github")}>Get Started</Button>
-                  <Button variant="outline" size="lg">
+                  {/* <Button variant="outline" size="lg">
                     Learn More
-                  </Button>
+                  </Button> */}
                 </div>
               </div>
             </motion.div>
